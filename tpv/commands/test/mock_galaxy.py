@@ -16,7 +16,9 @@ class Job:
         self.parameters = []
 
     def add_input_dataset(self, dataset_association):
-        self.input_datasets.append(JobToInputDatasetAssociation(dataset_association.name, dataset_association))
+        self.input_datasets.append(
+            JobToInputDatasetAssociation(dataset_association.name, dataset_association)
+        )
 
     def get_param_values(self, app):
         return self.param_values
@@ -72,11 +74,7 @@ class App:
         )
         self.job_metrics = JobMetrics()
         if create_model:
-            self.model = mapping.init(
-                "/tmp",
-                "sqlite:///:memory:",
-                create_tables=True
-            )
+            self.model = mapping.init("/tmp", "sqlite:///:memory:", create_tables=True)
         self.application_stack = ApplicationStack(app=self)
         self.job_config = JobConfiguration(self)
 
@@ -86,9 +84,11 @@ class User:
         self.username = username
         self.email = email
         self.roles = [Role(name) for name in roles]
-        self.id = id or int(
-            hashlib.sha256(f"{self.username}".encode("utf-8")).hexdigest(), 16
-        ) % 1000000
+        self.id = (
+            id
+            or int(hashlib.sha256(f"{self.username}".encode("utf-8")).hexdigest(), 16)
+            % 1000000
+        )
 
     def all_roles(self):
         """
