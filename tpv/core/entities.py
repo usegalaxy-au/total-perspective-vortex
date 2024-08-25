@@ -7,12 +7,7 @@ from enum import IntEnum
 from typing import Annotated, Any, ClassVar, Dict, Iterable, List, Optional
 
 from galaxy import util as galaxy_util
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    Field,
-    model_validator,
-)
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic.json_schema import SkipJsonSchema
 
 from .evaluator import TPVCodeEvaluator
