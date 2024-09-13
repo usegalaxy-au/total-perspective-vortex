@@ -23,8 +23,13 @@ class TPVConfigLinter(object):
         except Exception as e:
             log.error(f"Linting failed due to syntax errors in yaml file: {e}")
             raise TPVLintError("Linting failed due to syntax errors in yaml file: ") from e
-        default_inherits = loader.global_settings.get('default_inherits')
-        for tool_regex, tool in loader.tools.items():
+        self.lint_tools(loader)
+        self.lint_destinations(loader)
+        self.print_errors_and_warnings()
+
+    def lint_tools(self, loader):
+        default_inherits = loader.config.global_config.default_inherits
+        for tool_regex, tool in loader.config.tools.items():
             try:
                 re.compile(tool_regex)
             except re.error:
@@ -34,7 +39,10 @@ class TPVConfigLinter(object):
                     f"The tool named: {default_inherits} is marked globally as the tool to inherit from "
                     "by default. You may want to mark it as abstract if it is not an actual tool and it "
                     "will be excluded from scheduling decisions.")
-        for destination in loader.destinations.values():
+
+    def lint_destinations(self, loader):
+        default_inherits = loader.config.global_config.default_inherits
+        for destination in loader.config.destinations.values():
             if not destination.runner and not destination.abstract:
                 self.errors.append(f"Destination '{destination.id}' does not define the runner parameter. "
                                    "The runner parameter is mandatory.")
@@ -51,6 +59,8 @@ class TPVConfigLinter(object):
                     f"The destination named: {default_inherits} is marked globally as the destination to inherit from "
                     "by default. You may want to mark it as abstract if it is not meant to be dispatched to, and it "
                     "will be excluded from scheduling decisions.")
+
+    def print_errors_and_warnings(self):
         if self.warnings:
             for w in self.warnings:
                 log.warning(w)
